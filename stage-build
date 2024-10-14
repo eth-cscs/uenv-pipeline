@@ -81,25 +81,27 @@ done
 build_id=$(get_build_id)
 build_path="${build_root}/${name}/${build_id}"
 ci_path="$(pwd)"
+pipeline_path=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
-log "SCRATCH     ${SCRATCH}"
-log "USER        ${USER}"
-log "name        ${name}"
-log "system      ${system}"
-log "recipe-path ${recipe_path}"
-log "build-id    ${build_id}"
-log "build-root  ${build_root}"
-log "build-path  ${build_path}"
-log "ci-path     ${ci_path}"
-log "mount       ${mount}"
+log "SCRATCH        ${SCRATCH}"
+log "USER           ${USER}"
+log "name           ${name}"
+log "system         ${system}"
+log "recipe-path    ${recipe_path}"
+log "build-id       ${build_id}"
+log "build-root     ${build_root}"
+log "build-path     ${build_path}"
+log "ci-path        ${ci_path}"
+log "pipeline-path  ${pipeline_path}"
+log "mount          ${mount}"
 [[ ! -z ${spack_develop} ]] && log "develop"
 [[ ! -z ${no_bwrap} ]] && log "no bwrap"
 
 # Check if the recipe path exists
 [[ -d "${recipe_path}" ]] || err "recipe path '$recipe_path' does not exist"
 
-# add workflow directory to PATH
-export PATH="${ci_path}/workflow:$PATH"
+# add pipeline directory to PATH
+export PATH="${pipeline_path}:$PATH"
 
 ##
 # Set up build cache flags if a build cache is available
@@ -127,7 +129,7 @@ fi
 
 log "configuring oras"
 #TODO: revert after testing
-source ${ci_path}/workflow/util/setup-oras
+source ${pipeline_path}/util/setup-oras
 
 
 ##
@@ -135,7 +137,7 @@ source ${ci_path}/workflow/util/setup-oras
 ##
 
 # Initialise the stackinator
-source ${ci_path}/workflow/util/setup-stackinator
+source ${pipeline_path}/util/setup-stackinator
 
 ##
 # Configure the build
@@ -165,7 +167,7 @@ cd "${build_path}"
 log "building image in ${build_path}"
 
 echo "env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin make store.squashfs -j64"
-# Propagate username and password defined in workflow/util/setup-oras (to be used in pre-install script)
+# Propagate username and password defined in ${pipeline_path}/util/setup-oras (to be used in pre-install script)
 env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make store.squashfs -kj64
 [[ $? -eq 0  ]] || env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make store.squashfs -kj8
 
