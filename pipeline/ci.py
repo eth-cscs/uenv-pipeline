@@ -105,6 +105,8 @@ if __name__ == "__main__":
         print(f"ERROR parsing CLI arguments: str(e)")
         exit(1)
 
+    print(f"{prefix} -- {root_path}")
+
     # read and validate the configuration
     try:
         config = configuration.Config(pathlib.Path(args.config),pathlib.Path(args.recipes))
@@ -154,7 +156,7 @@ if __name__ == "__main__":
 
     output_path = pathlib.Path(args.output)
     with output_path.open("w") as f:
-        f.write(pipeline_template.render(jobs=[job]))
+        f.write(pipeline_template.render(jobs=[job], prefix=prefix))
 
     print(f"\n{util.colorize('SUCCESS', 'green')} wrote {output_path} output file\n")
 
