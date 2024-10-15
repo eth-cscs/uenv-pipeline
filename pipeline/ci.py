@@ -68,6 +68,7 @@ def readenv(config, args):
         "uenv": uenv,
         "version": version,
         "recipe": recipe,
+        "pipeline_path": root_path,
     }
 
 def make_argparser():
