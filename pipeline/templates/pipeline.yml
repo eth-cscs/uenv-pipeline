@@ -66,10 +66,10 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
 {% for job in jobs %}
 #@@cmd@@STACK_NAME="{{job.uenv}}/{{job.version}}"
 #@@cmd@@STACK_SYSTEM="{{job.system}}"
-#@@cmd@@STACK_RECIPE="job.recipe_path}}"
-#@@cmd@@SPACK_DEVELOP="job.spack_develop}}"
-#@@cmd@@STACK_MOUNT="job.mount}}"
-#@@cmd@@STACK_UARCH="job.uarch}}"
-#@@cmd@@NO_BWRAP="job.no_bwrap}}"
+#@@cmd@@STACK_RECIPE="{{job.recipe_path}}"
+#@@cmd@@SPACK_DEVELOP="{{job.spack_develop}}"
+#@@cmd@@STACK_MOUNT="{{job.mount}}"
+#@@cmd@@STACK_UARCH="{{job.uarch}}"
+#@@cmd@@NO_BWRAP="{{job.no_bwrap}}"
 #@@cmd@@{{prefix}}/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/jenkssl $SPACK_DEVELOP -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP
 {% endfor %}
