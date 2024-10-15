@@ -6,8 +6,8 @@ stages:
   stage: build
   timeout: 8h
   needs:
+    pipeline: $PARENT_PIPELINE_ID
     job: pipeline-configure
-    artifact: uenv-pipeline
   variables:
     SLURM_TIMELIMIT: 180
   script:
@@ -21,8 +21,8 @@ stages:
   stage: test
   timeout: 8h
   needs:
+    pipeline: $PARENT_PIPELINE_ID
     job: pipeline-configure
-    artifact: uenv-pipeline
   variables:
     SLURM_TIMELIMIT: 30
     GIT_STRATEGY: fetch
