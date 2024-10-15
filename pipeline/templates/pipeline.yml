@@ -11,8 +11,6 @@ stages:
   variables:
     SLURM_TIMELIMIT: 180
   script:
-  #- git clone https://github.com/eth-cscs/uenv-pipeline.git
-  - ls .
   - ./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/jenkssl $SPACK_DEVELOP -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP
   after_script:
   - rm -Rf /dev/shm/jenkssl
@@ -27,10 +25,6 @@ stages:
     SLURM_TIMELIMIT: 30
     GIT_STRATEGY: fetch
   script:
-  #- git clone https://github.com/eth-cscs/uenv-pipeline.git
-  - echo "CI PROJECT DIR $(CI_PROJECT_DIR)"
-  - ls $(CI_PROJECT_DIR)
-  - cp -r $(CI_PROJECT_DIR)/uenv-pipeline .
   - ./uenv-pipeline/stage-test -n $STACK_NAME -s $STACK_SYSTEM -m $STACK_MOUNT -u $STACK_UARCH
 
 {% for job in jobs %}
