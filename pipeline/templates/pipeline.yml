@@ -5,14 +5,14 @@ stages:
 .base-build:
   stage: build
   timeout: 8h
-  needs: [pipeline-configure]
+  needs:
+    job: pipeline-configure
+    artifact: uenv-pipeline
   variables:
     SLURM_TIMELIMIT: 180
   script:
   #- git clone https://github.com/eth-cscs/uenv-pipeline.git
-  - echo "CI PROJECT DIR $(CI_PROJECT_DIR)"
-  - ls $(CI_PROJECT_DIR)
-  - cp -r $(CI_PROJECT_DIR)/uenv-pipeline .
+  - ls .
   - ./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/jenkssl $SPACK_DEVELOP -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP
   after_script:
   - rm -Rf /dev/shm/jenkssl
@@ -20,7 +20,9 @@ stages:
 .base-test:
   stage: test
   timeout: 8h
-  needs: [pipeline-configure]
+  needs:
+    job: pipeline-configure
+    artifact: uenv-pipeline
   variables:
     SLURM_TIMELIMIT: 30
     GIT_STRATEGY: fetch
