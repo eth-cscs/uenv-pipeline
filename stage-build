@@ -135,7 +135,7 @@ fi
 # Download and configure oras
 ##
 
-if [ "$use_jfrog" != "no" ]; then
+if [ "$test_run" != "yes" ]; then
     log "configuring oras"
     source ${pipeline_path}/util/setup-oras
 fi
