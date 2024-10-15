@@ -49,19 +49,21 @@ done
 [[ "-" == "${mount}"       ]] && usage "missing mount argument"
 
 build_id=${CI_PIPELINE_ID}
+pipeline_path=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
-log "SCRATCH     ${SCRATCH}"
-log "USER        ${USER}"
-log "name        ${name}"
-log "system      ${system}"
-log "uarch       ${uarch}"
-log "mount       ${mount}"
-log "build_id    ${build_id}"
-log "ci_path     ${ci_path}"
-log "test_path   ${test_path}"
+log "SCRATCH        ${SCRATCH}"
+log "USER           ${USER}"
+log "name           ${name}"
+log "system         ${system}"
+log "uarch          ${uarch}"
+log "mount          ${mount}"
+log "build_id       ${build_id}"
+log "ci_path        ${ci_path}"
+log "test_path      ${test_path}"
+log "pipeline_path  ${pipeline_path}"
 
 # configure oras
-source ${ci_path}/worfklow/util/setup-oras
+source ${pipeline_path}/util/setup-oras
 
 # create the path in which tests will run...
 mkdir -p ${test_path}

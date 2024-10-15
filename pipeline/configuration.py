@@ -238,6 +238,7 @@ class Config:
             "version": env["version"],
             "uarch": env["uarch"],
             "recipe_path": env["recipe"],
+            "pipeline_path": env["pipeline_path"],
             "spack_develop": develop,
             "no_bwrap": no_bwrap,
             "mount": version.mount,

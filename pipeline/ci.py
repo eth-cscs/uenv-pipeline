@@ -9,7 +9,7 @@ import sys
 import yaml
 
 prefix = pathlib.Path(__file__).parent.resolve()
-root_path = prefix.parent.resolve().parent.resolve()
+root_path = prefix.parent.resolve()
 
 sys.path = [prefix.as_posix()] + sys.path
 
@@ -68,6 +68,7 @@ def readenv(config, args):
         "uenv": uenv,
         "version": version,
         "recipe": recipe,
+        "pipeline_path": root_path,
     }
 
 def make_argparser():
@@ -103,6 +104,8 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"ERROR parsing CLI arguments: str(e)")
         exit(1)
+
+    print(f"{prefix} -- {root_path}")
 
     # read and validate the configuration
     try:
@@ -153,7 +156,7 @@ if __name__ == "__main__":
 
     output_path = pathlib.Path(args.output)
     with output_path.open("w") as f:
-        f.write(pipeline_template.render(jobs=[job]))
+        f.write(pipeline_template.render(jobs=[job], prefix=root_path))
 
     print(f"\n{util.colorize('SUCCESS', 'green')} wrote {output_path} output file\n")
 
