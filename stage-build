@@ -201,17 +201,26 @@ repo_base=build/${system}/${uarch}/${name}
 repo=${repo_base}:${build_id}
 outpath_repo=${rego}/${repo}
 if [[ -n "$REPOSITORY_OVERRIDE_NAME" ]] ; then
+    # Allow overriding path, where the data is stored.
+    # This can be a remote path, or a local path
     outpath_repo="${REPOSITORY_OVERRIDE_NAME}"
 fi
 
+if [[ "${outpath_repo}" == "/"* ]] ; then
+    # local path
+    log "Copying store.squashfs and meta to ${outpath_repo}"
+    mkdir -p "$(dirname "${outpath_repo}")"
+    cp store.squashfs "${outpath_repo}"
+    cp -r store/meta "${outpath_repo}.meta"
+else
+    log "pushing store.squashfs to ${outpath_repo}"
+    oras push --registry-config ${jfrog_creds_path} ${outpath_repo} --artifact-type application/x-squashfs store.squashfs
+    [[ $? -eq 0  ]] || err "failed to push image"
 
-log "pushing store.squashfs to ${outpath_repo}"
-oras push --registry-config ${jfrog_creds_path} ${outpath_repo} --artifact-type application/x-squashfs store.squashfs
-[[ $? -eq 0  ]] || err "failed to push image"
-
-# push the metadata to jfrog
-log "pushing meta data to ${outpath_repo}"
-(cd ./store; oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta)
+    # push the metadata to jfrog
+    log "pushing meta data to ${outpath_repo}"
+    (cd ./store; oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta)
+fi
 
 log "clean up build path '${build_path}'"
 (rm -rf ${build_path})
