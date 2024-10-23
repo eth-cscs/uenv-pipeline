@@ -35,7 +35,7 @@ if [[ -z "$CSCS_REGISTRY_USERNAME" || -z "$CSCS_REGISTRY_PASSWORD" ]] ; then
 else
     log "using credentials provided in the environment"
     jfrog_u="$CSCS_REGISTRY_USERNAME"
-    jfrog_p="CSCS_REGISTRY_PASSWORD"
+    jfrog_p="$CSCS_REGISTRY_PASSWORD"
 fi
 
 log "log in to jfrog.svc.cscs.ch with oras"
