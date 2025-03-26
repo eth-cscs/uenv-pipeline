@@ -26,8 +26,9 @@ output_path="-"
 uarch="-"
 system="-"
 uenv="-"
+buildenv="-"
 
-while getopts c:r:o:s:u:a: flag
+while getopts c:r:o:s:u:a:b: flag
 do
     case "${flag}" in
         c) config_path=${OPTARG};;
@@ -36,6 +37,7 @@ do
         a) uarch=${OPTARG};;
         s) system=${OPTARG};;
         u) uenv=${OPTARG};;
+        b) buildenv=${OPTARG};;
     esac
 done
 
@@ -62,6 +64,17 @@ log "config_path  = $config_path"
 log "pipeline_path= $pipeline_path"
 log "recipe_path  = $recipe_path"
 log "output_path  = $output_path"
+log "buildenv     = $buildenv"
+
+# buildenv is an optional argument that should be the relative path to a json
+# file that describes environment variables to set during the build phase.
+if [ "-" != "${buildenv}" ]
+then
+    buildenvabs="$(realpath ${buildenv})"
+    [[ ! -f "${buildenvabs}"]] && usage "invalide -b parameter: the file ${buildenvabs} does not exist"
+    log "using build environment file ${buildenvabs}"
+    buildenvarg="--buildenv=${buildenvabs}"
+fi
 
 #
 # create temporary working path for python
@@ -88,7 +101,7 @@ pip install --upgrade --quiet pip
 pip install --quiet -r $pipeline_path/requirements.txt
 log "installed python dependencies"
 
-${pipeline_path}/ci.py --recipes="$recipe_path" --config="$config_path" --uarch="$uarch" --uenv="$uenv" --system="$system" --output="$output_path"
+${pipeline_path}/ci.py --recipes="$recipe_path" --config="$config_path" --uarch="$uarch" --uenv="$uenv" --system="$system" --output="$output_path" ${buildenvarg}
 [[ $? -eq 0  ]] || err "unable to configure"
 
 log "configuration complete"
