@@ -59,6 +59,10 @@ def readenv(config, args):
 
     recipe = config.recipe(uenv, version, uarch)
 
+    build_env = ""
+    if args.buildenv != "":
+        build_env = f"-e {args.buildenv}"
+
     if recipe is None:
         raise EnvError(f"the recipe {uenv}/{version} is not available for the {uarch} target")
 
@@ -69,6 +73,7 @@ def readenv(config, args):
         "version": version,
         "recipe": recipe,
         "pipeline_path": root_path,
+        "buildenv": build_env
     }
 
 def make_argparser():
@@ -84,6 +89,7 @@ def make_argparser():
     # that is looked up in the recipes path via the cluster config
     parser.add_argument("-r", "--recipes", required=True, type=str)
     parser.add_argument("-u", "--uenv", required=True, type=str)
+    parser.add_argument("-b", "--buildenv", default="", type=str)
 
     return parser
 

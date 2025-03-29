@@ -11,7 +11,7 @@ stages:
   variables:
     SLURM_TIMELIMIT: 180
   script:
-  - ./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/jenkssl $SPACK_DEVELOP -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP
+  - ./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/jenkssl $SPACK_DEVELOP -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP $BUILD_ENV
   after_script:
   - rm -Rf /dev/shm/jenkssl
 
@@ -45,6 +45,7 @@ build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
     STACK_RECIPE:     "{{job.recipe_path}}"
     STACK_UARCH:      "{{job.uarch}}"
     SLURM_PARTITION:  "{{job.partition}}"
+    BUILD_ENV:        "{{job.buildenv}}"
     {% for name, value in job.runner.variables.items() %}
     {{ name }}: "{{ value }}"
     {% endfor %}
