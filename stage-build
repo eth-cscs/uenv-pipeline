@@ -44,7 +44,7 @@ usage () {
     echo ""
     echo "-d: enable spack develop mode"
     echo "-w: enable no-bwrap mode"
-    echo "-t: run in test mode"
+    echo "-t: disable pushing artifacts to registry"
     [[ "" == "$1" ]] && exit 0
     err "$1"
 }
@@ -57,9 +57,9 @@ uarch="-"
 mount="-"
 spack_develop=""
 no_bwrap=""
-# if this is set to "yes", assume we are doing a manual test run and don
+# if this is set to "yes", assume we are doing a manual test run and do
 # not push to jfrog
-test_run=""
+no_push=""
 
 echo "====== parsing arguments $@"
 
@@ -74,7 +74,7 @@ do
         m) mount=${OPTARG};;
         d) spack_develop="--develop";;
         w) no_bwrap="--no-bwrap";;
-        t) test_run="yes";;
+        t) no_push="yes";;
     esac
 done
 
@@ -103,7 +103,7 @@ log "pipeline-path  ${pipeline_path}"
 log "mount          ${mount}"
 [[ ! -z ${spack_develop} ]] && log "develop"
 [[ ! -z ${no_bwrap} ]] && log "no bwrap"
-[[ "${test_run}" == "yes" ]] && log "running in test mode"
+[[ "${no_push}" == "yes" ]] && log "disabled push to registry"
 
 # Check if the recipe path exists
 [[ -d "${recipe_path}" ]] || err "recipe path '$recipe_path' does not exist"
@@ -135,7 +135,7 @@ fi
 # Download and configure oras
 ##
 
-if [ "$test_run" != "yes" ]; then
+if [ "$no_push" != "yes" ]; then
     log "configuring oras"
     source ${pipeline_path}/util/setup-oras
 fi
@@ -180,16 +180,15 @@ echo "env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin make store.sq
 env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make store.squashfs -kj64
 [[ $? -eq 0  ]] || env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make store.squashfs -kj8
 
-if [ "$test_run" == "yes" ]; then
-    exit 0;
+if [ ! $? -eq 0 ]; then
+    log "JOB Failed: pushing to build cache before exit"
+    env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make cache-force -j32
+    cp -r "${build_path}/tmp/uenv-build/spack-stage/" $CI_PROJECT_DIR
+    err "error building image"
 fi
 
-if [ ! $? -eq 0 ]; then
-    log "TODO: save WIP of build an store it for later inspection"
-    log "pushing to build cache"
-    env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make cache-force -j32
-    cp -r "${build_path}/tmp/jenkssl/spack-stage/" $CI_PROJECT_DIR
-    err "error building image"
+if [ "$no_push" == "yes" ]; then
+    exit 0;
 fi
 
 ##
@@ -199,14 +198,28 @@ fi
 rego=jfrog.svc.cscs.ch/uenv
 repo_base=build/${system}/${uarch}/${name}
 repo=${repo_base}:${build_id}
+outpath_repo=${rego}/${repo}
+if [[ -n "$REPOSITORY_OVERRIDE_NAME" ]] ; then
+    # Allow overriding path, where the data is stored.
+    # This can be a remote path, or a local path
+    outpath_repo="${REPOSITORY_OVERRIDE_NAME}"
+fi
 
-log "pushing store.squashfs to ${rego}/${repo}"
-oras push --registry-config ${jfrog_creds_path} ${rego}/${repo} --artifact-type application/x-squashfs store.squashfs
-[[ $? -eq 0  ]] || err "failed to push image"
+if [[ "${outpath_repo}" == "/"* ]] ; then
+    # local path
+    log "Copying store.squashfs and meta to ${outpath_repo}"
+    mkdir -p "$(dirname "${outpath_repo}")"
+    cp store.squashfs "${outpath_repo}"
+    cp -r store/meta "${outpath_repo}.meta"
+else
+    log "pushing store.squashfs to ${outpath_repo}"
+    oras push --registry-config ${jfrog_creds_path} ${outpath_repo} --artifact-type application/x-squashfs store.squashfs
+    [[ $? -eq 0  ]] || err "failed to push image"
 
-# push the metadata to jfrog
-log "pushing meta data to ${rego}/${repo}"
-(cd ./store; oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${rego}/${repo} ./meta)
+    # push the metadata to jfrog
+    log "pushing meta data to ${outpath_repo}"
+    (cd ./store; oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta)
+fi
 
 log "clean up build path '${build_path}'"
 (rm -rf ${build_path})
