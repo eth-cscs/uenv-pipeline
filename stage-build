@@ -111,6 +111,27 @@ log "mount          ${mount}"
 # add pipeline directory to PATH
 export PATH="${pipeline_path}:$PATH"
 
+# build a list of environment variables with the UENV_CIBUILDV_ prefix
+# in order to forward them to the make call that builds the uenv, and
+# set them in this environment
+BUILD_VARS=()
+BUILD_VAR_NAMES=()
+for name in ${!UENV_CIBUILDV_*} ;
+do
+    # NOTE: take care to print only the variable name, and not its value, to not leak secrets
+    log "setting uenv build variable '${name#UENV_CIBUILDV_}'"
+    BUILD_VARS+=("${name#UENV_CIBUILDV_}=${!name}")
+    BUILD_VAR_NAMES+=("${name#UENV_CIBUILDV_}")
+done
+for var in "${BUILD_VARS[@]}"; do
+    export "$var"
+done
+# append the other variables that are required in the make environment
+BUILD_VARS+=("PATH=/usr/bin:/bin:${PWD}/spack/bin")
+BUILD_VARS+=("HOME=$HOME")
+BUILD_VARS+=("https_proxy=$https_proxy" "http_proxy=$http_proxy" "no_proxy=$no_proxy")
+BUILD_VAR_NAMES+=("PATH" "HOME" "https_proxy" "http_proxy" "no_proxy")
+
 ##
 # Set up build cache flags if a build cache is available
 ##
@@ -138,8 +159,10 @@ fi
 if [ "$no_push" != "yes" ]; then
     log "configuring oras"
     source ${pipeline_path}/util/setup-oras
-fi
 
+    BUILD_VARS+=("CSCS_REGISTRY_USERNAME=$jfrog_u" "CSCS_REGISTRY_PASSWORD=$jfrog_p")
+    BUILD_VAR_NAMES+=("CSCS_REGISTRY_USERNAME" "CSCS_REGISTRY_PASSWORD")
+fi
 
 ##
 # Clone the stackinator and alps cluster configuration
@@ -175,14 +198,16 @@ cd "${build_path}"
 
 log "building image in ${build_path}"
 
-echo "env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin make store.squashfs -j64"
+### WARNING: only print variable names BUILD_VAR_NAMES, not the values
+echo "env --ignore-environment ${BUILD_VAR_NAMES[@]} make store.squashfs -j64"
 # Propagate username and password defined in ${pipeline_path}/util/setup-oras (to be used in pre-install script)
-env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make store.squashfs -kj64
-[[ $? -eq 0  ]] || env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make store.squashfs -kj8
+env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj64
+# if the build failed, try again and back off to only 8 tasks
+[[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8
 
 if [ ! $? -eq 0 ]; then
     log "JOB Failed: pushing to build cache before exit"
-    env --ignore-environment PATH=/usr/bin:/bin:${PWD}/spack/bin  HOME=$HOME https_proxy=$https_proxy http_proxy=$http_proxy no_proxy="$no_proxy" CSCS_REGISTRY_USERNAME=$jfrog_u CSCS_REGISTRY_PASSWORD=$jfrog_p make cache-force -j32
+    env --ignore-environment "${BUILD_VARS[@]}" make cache-force -j32
     cp -r "${build_path}/tmp/uenv-build/spack-stage/" $CI_PROJECT_DIR
     err "error building image"
 fi
