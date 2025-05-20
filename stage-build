@@ -208,7 +208,7 @@ env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj64
 if [ ! $? -eq 0 ]; then
     log "JOB Failed: pushing to build cache before exit"
     env --ignore-environment "${BUILD_VARS[@]}" make cache-force -j32
-    cp -r "${build_path}/tmp/uenv-build/spack-stage/" $CI_PROJECT_DIR
+    cp -r "${build_path}/tmp/$(id -un)/spack-stage/" $CI_PROJECT_DIR
     err "error building image"
 fi
 
