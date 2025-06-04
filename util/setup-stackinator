@@ -30,3 +30,7 @@ cluster_repo=https://github.com/eth-cscs/alps-cluster-config
 
 log "cloning cluster config from ${cluster_repo}"
 git clone --quiet "${cluster_repo}" "${cluster_path}" || err "unable to clone cluster-config git repository"
+
+log "checkout alps-cluster-config ${tool_version}"
+cd "${cluster_path}"
+git checkout "${tool_version}" || err "unable to checkout out requested version"
