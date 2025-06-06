@@ -165,6 +165,13 @@ if [ "$no_push" != "yes" ]; then
 fi
 
 ##
+# Download and configure uv
+##
+
+log "configuring uv"
+source ${pipeline_path}/util/setup-uv
+
+##
 # Clone the stackinator and alps cluster configuration
 ##
 

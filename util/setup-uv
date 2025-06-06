@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+# see https://astral.sh/uv/install.sh
+
+uv_url=https://astral.sh/uv/install.sh
+
+log "download and install uv $uv_url"
+
+uv_path=`mktemp -d`
+
+curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="$uv_path" sh
+
+export PATH="$uv_path:$PATH"
+log "$(uv --version) installed in ${uv_path}"
