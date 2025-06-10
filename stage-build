@@ -61,6 +61,8 @@ no_bwrap=""
 # not push to jfrog
 no_push=""
 
+log "repo: $(git log -1 --pretty=format:'%D %h %s')"
+
 echo "====== parsing arguments $@"
 
 while getopts n:s:r:b:u:m:dwt flag
@@ -146,8 +148,9 @@ if [ -d "${mirror_path}" ]; then
         log "found build cache key at $key_path"
         echo "key: ${mirror_path}/push-key.gpg" >> cache.yaml
     fi
+    log "cache.yaml:"
     cat cache.yaml
-    cache_flags="--cache cache.yaml"
+    cache_flags="--cache $(realpath cache.yaml)"
 else
     log "no build cache found at $mirror_path"
     rm -f cache.yaml

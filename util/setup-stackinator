@@ -21,8 +21,8 @@ cd "${tool_path}"
 log "checkout stackinator testing-v5"
 git checkout testing-v5 || err "unable to checkout out requested version"
 
-log "bootstrap stackinator"
-cd "${tool_path}"
+#log "bootstrap stackinator"
+#cd "${tool_path}"
 # TODO: uv replaces boostrap
 #./bootstrap.sh || err "bootstrap failed"
 
@@ -30,6 +30,7 @@ cd "${tool_base_path}"
 log "finished stackinator installation"
 
 export PATH="${tool_path}/bin:$PATH"
+log "PATH is now $PATH"
 
 cluster_path=`mktemp -d`
 cluster_repo=https://github.com/eth-cscs/alps-cluster-config
