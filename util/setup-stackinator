@@ -7,7 +7,7 @@ tool_path=`mktemp -d`
 tool_repo=https://github.com/eth-cscs/stackinator.git
 tool_version=releases/v5
 
-# TODO: use yq to determine the recipe version
+# TODO: use yq to determine the recipe version when we support spack 1.0 recipes
 
 log "installing stackinator from git in '${tool_path}'"
 
@@ -15,16 +15,8 @@ log "cloning stackinator from ${tool_repo}"
 git clone "${tool_repo}" "${tool_path}" || err "unable to clone stackinator git repository"
 
 cd "${tool_path}"
-# TODO: revert these changes
-#log "checkout stackinator ${tool_version}"
-#git checkout "${tool_version}" || err "unable to checkout out requested version"
-log "checkout stackinator testing-v5"
-git checkout testing-v5 || err "unable to checkout out requested version"
-
-#log "bootstrap stackinator"
-#cd "${tool_path}"
-# TODO: uv replaces boostrap
-#./bootstrap.sh || err "bootstrap failed"
+log "checkout stackinator ${tool_version}"
+git checkout "${tool_version}" || err "unable to checkout out requested version"
 
 cd "${tool_base_path}"
 log "finished stackinator installation"
