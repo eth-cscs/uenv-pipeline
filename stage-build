@@ -129,7 +129,7 @@ for var in "${BUILD_VARS[@]}"; do
     export "$var"
 done
 # append the other variables that are required in the make environment
-BUILD_VARS+=("PATH=/usr/bin:/bin:${PWD}/spack/bin")
+BUILD_VARS+=("PATH=/usr/bin:/bin:${build_path}/spack/bin")
 BUILD_VARS+=("HOME=$HOME")
 BUILD_VARS+=("https_proxy=$https_proxy" "http_proxy=$http_proxy" "no_proxy=$no_proxy")
 BUILD_VAR_NAMES+=("PATH" "HOME" "https_proxy" "http_proxy" "no_proxy")
@@ -165,6 +165,7 @@ if [ "$no_push" != "yes" ]; then
     log "configuring oras"
     source ${pipeline_path}/util/setup-oras
 
+    # Propagate username and password defined in ${pipeline_path}/util/setup-oras (to be used in pre-install script)
     BUILD_VARS+=("CSCS_REGISTRY_USERNAME=$jfrog_u" "CSCS_REGISTRY_PASSWORD=$jfrog_p")
     BUILD_VAR_NAMES+=("CSCS_REGISTRY_USERNAME" "CSCS_REGISTRY_PASSWORD")
 fi
@@ -211,8 +212,8 @@ cd "${build_path}"
 log "building image in ${build_path}"
 
 ### WARNING: only print variable names BUILD_VAR_NAMES, not the values
+log "note, environment variable values are not printed"
 echo "env --ignore-environment ${BUILD_VAR_NAMES[@]} make store.squashfs -j64"
-# Propagate username and password defined in ${pipeline_path}/util/setup-oras (to be used in pre-install script)
 env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj64
 # if the build failed, try again and back off to only 8 tasks
 [[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8
