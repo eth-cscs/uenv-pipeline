@@ -7,23 +7,22 @@ tool_path=`mktemp -d`
 tool_repo=https://github.com/eth-cscs/stackinator.git
 tool_version=releases/v5
 
+# TODO: use yq to determine the recipe version when we support spack 1.0 recipes
+
 log "installing stackinator from git in '${tool_path}'"
 
 log "cloning stackinator from ${tool_repo}"
 git clone "${tool_repo}" "${tool_path}" || err "unable to clone stackinator git repository"
 
+cd "${tool_path}"
 log "checkout stackinator ${tool_version}"
-cd "${tool_path}"
 git checkout "${tool_version}" || err "unable to checkout out requested version"
-
-log "bootstrap stackinator"
-cd "${tool_path}"
-./bootstrap.sh || err "bootstrap failed"
 
 cd "${tool_base_path}"
 log "finished stackinator installation"
 
 export PATH="${tool_path}/bin:$PATH"
+log "PATH is now $PATH"
 
 cluster_path=`mktemp -d`
 cluster_repo=https://github.com/eth-cscs/alps-cluster-config

@@ -64,6 +64,8 @@ log "pipeline_path  ${pipeline_path}"
 
 # configure oras
 source ${pipeline_path}/util/setup-oras
+# configure uv
+source ${pipeline_path}/util/setup-uv
 
 # create the path in which tests will run...
 mkdir -p ${test_path}
