@@ -140,11 +140,13 @@ mirror_path=$SCRATCH/uenv-cache
 if [ -d "${mirror_path}" ]; then
     log "found build cache at $mirror_path"
     echo "root: $mirror_path" > cache.yaml
+    log "cache file: $(realpath cache.yaml) in working path $(pwd)"
     key_path="${mirror_path}/push-key.gpg"
     if [[ -f "${key_path}" ]]; then
         log "found build cache key at $key_path"
         echo "key: ${mirror_path}/push-key.gpg" >> cache.yaml
     fi
+    cat cache.yaml
     cache_flags="--cache cache.yaml"
 else
     log "no build cache found at $mirror_path"
