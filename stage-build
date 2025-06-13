@@ -174,9 +174,6 @@ fi
 # Initialise the stackinator
 source ${pipeline_path}/util/setup-stackinator
 
-# TODO: remove
-exit
-
 ##
 # Configure the build
 ##
