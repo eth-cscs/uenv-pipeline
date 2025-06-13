@@ -131,8 +131,7 @@ done
 # append the other variables that are required in the make environment
 BUILD_VARS+=("PATH=/usr/bin:/bin:${build_path}/spack/bin")
 BUILD_VARS+=("HOME=$HOME")
-BUILD_VARS+=("https_proxy=$https_proxy" "http_proxy=$http_proxy" "no_proxy=$no_proxy")
-BUILD_VAR_NAMES+=("PATH" "HOME" "https_proxy" "http_proxy" "no_proxy")
+BUILD_VAR_NAMES+=("PATH" "HOME")
 
 ##
 # Set up build cache flags if a build cache is available
@@ -158,24 +157,14 @@ else
 fi
 
 ##
-# Download and configure oras
+# Download dependencies
 ##
+
+source ${pipeline_path}/util/setup-dependencies
 
 if [ "$no_push" != "yes" ]; then
-    log "configuring oras"
-    source ${pipeline_path}/util/setup-oras
-
-    # Propagate username and password defined in ${pipeline_path}/util/setup-oras (to be used in pre-install script)
-    BUILD_VARS+=("CSCS_REGISTRY_USERNAME=$jfrog_u" "CSCS_REGISTRY_PASSWORD=$jfrog_p")
-    BUILD_VAR_NAMES+=("CSCS_REGISTRY_USERNAME" "CSCS_REGISTRY_PASSWORD")
+    source ${pipeline_path}/util/setup-credentials
 fi
-
-##
-# Download and configure uv
-##
-
-log "configuring uv"
-source ${pipeline_path}/util/setup-uv
 
 ##
 # Clone the stackinator and alps cluster configuration
@@ -251,11 +240,13 @@ if [[ "${outpath_repo}" == "/"* ]] ; then
     cp -r store/meta "${outpath_repo}.meta"
 else
     log "pushing store.squashfs to ${outpath_repo}"
+    log "oras push --registry-config ${jfrog_creds_path} ${outpath_repo} --artifact-type application/x-squashfs store.squashfs"
     oras push --registry-config ${jfrog_creds_path} ${outpath_repo} --artifact-type application/x-squashfs store.squashfs
     [[ $? -eq 0  ]] || err "failed to push image"
 
     # push the metadata to jfrog
     log "pushing meta data to ${outpath_repo}"
+    log "oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta"
     (cd ./store; oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta)
 fi
 
