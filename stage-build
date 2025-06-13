@@ -158,24 +158,14 @@ else
 fi
 
 ##
-# Download and configure oras
+# Download dependencies
 ##
+
+source ${pipeline_path}/util/setup-dependencies
 
 if [ "$no_push" != "yes" ]; then
-    log "configuring oras"
-    source ${pipeline_path}/util/setup-oras
-
-    # Propagate username and password defined in ${pipeline_path}/util/setup-oras (to be used in pre-install script)
-    BUILD_VARS+=("CSCS_REGISTRY_USERNAME=$jfrog_u" "CSCS_REGISTRY_PASSWORD=$jfrog_p")
-    BUILD_VAR_NAMES+=("CSCS_REGISTRY_USERNAME" "CSCS_REGISTRY_PASSWORD")
+    source ${pipeline_path}/util/setup-credentials
 fi
-
-##
-# Download and configure uv
-##
-
-log "configuring uv"
-source ${pipeline_path}/util/setup-uv
 
 ##
 # Clone the stackinator and alps cluster configuration
@@ -183,6 +173,9 @@ source ${pipeline_path}/util/setup-uv
 
 # Initialise the stackinator
 source ${pipeline_path}/util/setup-stackinator
+
+# TODO: remove
+exit
 
 ##
 # Configure the build

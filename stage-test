@@ -62,10 +62,9 @@ log "ci_path        ${ci_path}"
 log "test_path      ${test_path}"
 log "pipeline_path  ${pipeline_path}"
 
-# configure oras
-source ${pipeline_path}/util/setup-oras
-# configure uv
-source ${pipeline_path}/util/setup-uv
+# configure dependencies
+source ${pipeline_path}/util/setup-dependencies
+source ${pipeline_path}/util/setup-credentials
 
 # create the path in which tests will run...
 mkdir -p ${test_path}

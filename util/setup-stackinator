@@ -1,27 +1,37 @@
 # to be sourced from stage-build
 
-tool_base_path="$(pwd)"
+s8r_base_path="$(pwd)"
 # check out a unique copy of stackinator for each ci task, so that
 # builds in the same pipeline do not conflict
-tool_path=`mktemp -d`
-tool_repo=https://github.com/eth-cscs/stackinator.git
-tool_version=releases/v5
+stackinator_path=`mktemp -d`
+stackinator_repo=https://github.com/eth-cscs/stackinator.git
 
-# TODO: use yq to determine the recipe version when we support spack 1.0 recipes
+uenv_recipe_version=$(yq '.version // 1' ${recipe_path}/config.yaml)
+log "detected uenv recipe version $uenv_recipe_version"
 
-log "installing stackinator from git in '${tool_path}'"
+if [ "$uenv_recipe_version" = "1" ]; then
+    stackinator_version=releases/v5
+elif [ "$uenv_recipe_version" = "2" ]; then
+    stackinator_version=main
+else
+    err "invalide uenv recipe version '${uenv_recipe_version}': must be '1' ir '2'"
+fi
 
-log "cloning stackinator from ${tool_repo}"
-git clone "${tool_repo}" "${tool_path}" || err "unable to clone stackinator git repository"
+log "using stackinator version ${stackinator_version}"
 
-cd "${tool_path}"
-log "checkout stackinator ${tool_version}"
-git checkout "${tool_version}" || err "unable to checkout out requested version"
+log "installing stackinator from git in '${stackinator_path}'"
 
-cd "${tool_base_path}"
+log "cloning stackinator from ${stackinator_repo}"
+git clone --quiet "${stackinator_repo}" "${stackinator_path}" || err "unable to clone stackinator git repository"
+
+cd "${stackinator_path}"
+log "checkout stackinator ${stackinator_version}"
+git checkout --quiet "${stackinator_version}" || err "unable to checkout out requested version"
+
+cd "${stackinator_base_path}"
 log "finished stackinator installation"
 
-export PATH="${tool_path}/bin:$PATH"
+export PATH="${stackinator_path}/bin:$PATH"
 log "PATH is now $PATH"
 
 cluster_path=`mktemp -d`
@@ -30,6 +40,6 @@ cluster_repo=https://github.com/eth-cscs/alps-cluster-config
 log "cloning cluster config from ${cluster_repo}"
 git clone --quiet "${cluster_repo}" "${cluster_path}" || err "unable to clone cluster-config git repository"
 
-log "checkout alps-cluster-config ${tool_version}"
+log "checkout alps-cluster-config ${stackinator_version}"
 cd "${cluster_path}"
-git checkout "${tool_version}" || err "unable to checkout out requested version"
+git checkout --quiet "${stackinator_version}" || err "unable to checkout out requested version"
