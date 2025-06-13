@@ -251,11 +251,13 @@ if [[ "${outpath_repo}" == "/"* ]] ; then
     cp -r store/meta "${outpath_repo}.meta"
 else
     log "pushing store.squashfs to ${outpath_repo}"
+    log "oras push --registry-config ${jfrog_creds_path} ${outpath_repo} --artifact-type application/x-squashfs store.squashfs"
     oras push --registry-config ${jfrog_creds_path} ${outpath_repo} --artifact-type application/x-squashfs store.squashfs
     [[ $? -eq 0  ]] || err "failed to push image"
 
     # push the metadata to jfrog
     log "pushing meta data to ${outpath_repo}"
+    log "oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta"
     (cd ./store; oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta)
 fi
 

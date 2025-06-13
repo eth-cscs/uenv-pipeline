@@ -46,6 +46,7 @@ log "log in to jfrog.svc.cscs.ch with oras"
 jfrog_creds_path="${oras_path}/docker/config.json"
 log "jfrog credentials to be stored in $jfrog_creds_path"
 
+log "oras login --registry-config ${jfrog_creds_path}  jfrog.svc.cscs.ch --username ${jfrog_u} --password-stdin"
 echo ${jfrog_p} | oras login --registry-config ${jfrog_creds_path}  jfrog.svc.cscs.ch --username "${jfrog_u}" --password-stdin
 [[ $? -eq 0  ]] || err "failed oras login to JFrog - can't push image to uenv registry"
 
