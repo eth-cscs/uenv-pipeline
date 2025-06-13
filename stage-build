@@ -131,8 +131,7 @@ done
 # append the other variables that are required in the make environment
 BUILD_VARS+=("PATH=/usr/bin:/bin:${build_path}/spack/bin")
 BUILD_VARS+=("HOME=$HOME")
-BUILD_VARS+=("https_proxy=$https_proxy" "http_proxy=$http_proxy" "no_proxy=$no_proxy")
-BUILD_VAR_NAMES+=("PATH" "HOME" "https_proxy" "http_proxy" "no_proxy")
+BUILD_VAR_NAMES+=("PATH" "HOME")
 
 ##
 # Set up build cache flags if a build cache is available
