@@ -48,7 +48,7 @@ done
 [[ "-" == "${uarch}"       ]] && usage "missing uarch argument"
 [[ "-" == "${mount}"       ]] && usage "missing mount argument"
 
-build_id=${CI_PIPELINE_ID}
+build_id=1921097488 # hardcoding for testing ${CI_PIPELINE_ID}
 pipeline_path=$(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)
 
 log "SCRATCH        ${SCRATCH}"
