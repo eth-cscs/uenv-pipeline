@@ -72,7 +72,7 @@ cd ${test_path}
 artifact_path="${test_path}/artifacts"
 mkdir -p $artifact_path
 
-rego=jfrog.svc.cscs.ch/uenv
+registry=jfrog.svc.cscs.ch/uenv
 #repo_base=build/${system}/${uarch}/${name}/${build_id}
 #repo=${repo_base}:latest
 repo_base=build/${system}/${uarch}/${name}
@@ -83,13 +83,13 @@ repo=${repo_base}:${build_id}
 #
 
 # step 1: look up the digest of the meta data
-log "looking for meta data for image at $rego/$repo"
-meta_digest=$(oras discover --registry-config ${jfrog_creds_path} --output json --artifact-type 'uenv/meta' $rego/$repo | jq -r '.manifests[0].digest')
+log "looking for meta data for image at $registry/$repo"
+meta_digest=$(oras discover --registry-config ${jfrog_creds_path} --output json --artifact-type 'uenv/meta' $registry/$repo | jq -r '.manifests[0].digest')
 log "found metadata digest $meta_digest"
 
 # step 2: download the meta data
-log "downloading meta data image from ${rego}/${repo_base}@$meta_digest"
-oras pull --registry-config ${jfrog_creds_path} --output "${artifact_path}" "${rego}/${repo_base}@$meta_digest"
+log "downloading meta data image from ${registry}/${repo_base}@$meta_digest"
+oras pull --registry-config ${jfrog_creds_path} --output "${artifact_path}" "${registry}/${repo_base}@$meta_digest"
 [[ $? -eq 0  ]] || err "failed to download meta data"
 
 rfm_meta_path="${artifact_path}/meta/extra/reframe.yaml"
@@ -107,8 +107,8 @@ cp $rfm_meta_path "${artifact_path}/store.yaml"
 # download the squashfs image from jfrog
 #
 
-log "downloading squashfs image from ${rego}/${repo}"
-oras pull --registry-config ${jfrog_creds_path} --output "${artifact_path}" "${rego}/${repo}"
+log "downloading squashfs image from ${registry}/${repo}"
+oras pull --registry-config ${jfrog_creds_path} --output "${artifact_path}" "${registry}/${repo}"
 [[ $? -eq 0  ]] || err "failed to download squashfs"
 squashfs_path="${artifact_path}/store.squashfs"
 
@@ -120,7 +120,7 @@ python3 -m venv rfm_venv
 source rfm_venv/bin/activate
 #pip install --upgrade reframe-hpc
 git clone https://github.com/reframe-hpc/reframe.git
-(cd reframe; git checkout v4.6.1; ./bootstrap.sh)
+(cd reframe; git checkout v4.8.2; ./bootstrap.sh)
 export PATH="$(pwd)/reframe/bin:$PATH"
 
 log "clone cscs-reframe-tests"
@@ -143,7 +143,7 @@ then
     report_path=$(find -type f -name report.xml)
     log "report generated in $report_path"
     cat $report_path
-    oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/reframe "${rego}/${repo}" "${report_path}"
+    oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/reframe "${registry}/${repo}" "${report_path}"
 else
     err "Reframe test run failed - no report artifact pushed"
 fi
