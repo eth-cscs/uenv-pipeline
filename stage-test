@@ -100,9 +100,6 @@ find "${artifact_path}"
 log "looking for reframe metadata in ${rfm_meta_path}"
 [[ -f "${rfm_meta_path}" ]] || exit_without_error "no reframe meta data provided: skipping tests"
 
-# copy the meta data to the location where reframe expects to find it.
-cp $rfm_meta_path "${artifact_path}/store.yaml"
-
 #
 # download the squashfs image from jfrog
 #
@@ -126,9 +123,9 @@ export PATH="$(pwd)/reframe/bin:$PATH"
 log "clone cscs-reframe-tests"
 rm -rf cscs-reframe-tests
 git clone --single-branch --branch main https://github.com/eth-cscs/cscs-reframe-tests.git
-pip install python-hostlist
+pip install python-hostlist pyfirecrest
 
-export UENV="${squashfs_path}:${mount}"
+export UENV="${squashfs_path}" # TODO: Need to keep mount point for v5?
 export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
 export RFM_USE_LOGIN_SHELL=1
 
