@@ -61,6 +61,9 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
     STACK_UARCH:      "{{job.uarch}}"
     STACK_MOUNT:      "{{job.mount}}"
     SLURM_PARTITION:  "{{job.partition}}"
+    {% for name, value in job.runner.variables.items() %}
+    {{ name }}: "{{ value }}"
+    {% endfor %}
 
 {% endfor %}
 
