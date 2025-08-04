@@ -23,7 +23,6 @@ stages:
     job: pipeline-configure
   variables:
     SLURM_TIMELIMIT: 180
-    GIT_STRATEGY: fetch
   script:
   - ./uenv-pipeline/stage-test -n $STACK_NAME -s $STACK_SYSTEM -m $STACK_MOUNT -u $STACK_UARCH
 
