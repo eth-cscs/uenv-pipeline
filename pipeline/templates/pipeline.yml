@@ -21,6 +21,7 @@ stages:
   needs:
     pipeline: $PARENT_PIPELINE_ID
     job: pipeline-configure
+    artifacts: true
   variables:
     SLURM_TIMELIMIT: 180
   script:
