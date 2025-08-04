@@ -29,7 +29,7 @@ stages:
 
 {% for job in jobs %}
 
-build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
+.build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
   extends: .base-build
 {% if job.runner.f7t %}
   tags: ["f7t-runner"]
@@ -56,7 +56,7 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
 {% else %}
   tags: ["{{job.runner.slurm_runner}}"]
 {% endif %}
-  needs: ["build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"]
+  # needs: ["build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"]
   variables:
     STACK_NAME:       "{{job.uenv}}/{{job.version}}"
     STACK_SYSTEM:     "{{job.system}}"
