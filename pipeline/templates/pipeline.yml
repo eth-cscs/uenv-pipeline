@@ -19,9 +19,9 @@ stages:
   stage: test
   timeout: 8h
   needs:
-    pipeline: $PARENT_PIPELINE_ID
-    job: pipeline-configure
-    artifacts: true
+    - pipeline: $PARENT_PIPELINE_ID
+      job: pipeline-configure
+      artifacts: true
   variables:
     SLURM_TIMELIMIT: 180
   script:
@@ -56,7 +56,9 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
 {% else %}
   tags: ["{{job.runner.slurm_runner}}"]
 {% endif %}
-  needs: ["build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"]
+  needs:
+    - job: ["build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"]
+      artifacts: true
   variables:
     STACK_NAME:       "{{job.uenv}}/{{job.version}}"
     STACK_SYSTEM:     "{{job.system}}"
