@@ -21,7 +21,6 @@ stages:
   needs:
     pipeline: $PARENT_PIPELINE_ID
     job: pipeline-configure
-    # artifacts: true
   variables:
     SLURM_TIMELIMIT: 180
   script:
@@ -56,9 +55,15 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
 {% else %}
   tags: ["{{job.runner.slurm_runner}}"]
 {% endif %}
-  # needs:
-  #   job: "build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"
-  #   artifacts: true
+  needs:
+    # Repeat the needs for the parent pipeline. Only specifying the build-* job
+    # as a needs here would override the needs for the parent pipeline. Not
+    # depending on the parent pipeline means that the artifact from the parent
+    # pipeline isn't downloaded, which contains e.g. the checkout of
+    # uenv-pipeline.
+    - pipeline: $PARENT_PIPELINE_ID
+      job: pipeline-configure
+    - job: "build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"
   variables:
     STACK_NAME:       "{{job.uenv}}/{{job.version}}"
     STACK_SYSTEM:     "{{job.system}}"
