@@ -129,7 +129,7 @@ export UENV="${squashfs_path}" # TODO: Need to keep mount point for v5?
 export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
 export RFM_USE_LOGIN_SHELL=1
 
-REFRAME_COMMAND="reframe -C $PWD/cscs-reframe-tests/config/cscs.py --report-junit=report.xml -r --system=${RFM_SYSTEM} --mode uenv_production"
+REFRAME_COMMAND="reframe -C $PWD/cscs-reframe-tests/config/cscs.py --report-junit=report.xml -r --system=${RFM_SYSTEM} --mode uenv_deployment"
 
 log "running reframe: ${REFRAME_COMMAND}"
 pwd
