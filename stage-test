@@ -135,8 +135,8 @@ log "running reframe: ${REFRAME_COMMAND}"
 pwd
 pushd cscs-reframe-tests
 ${REFRAME_COMMAND}
-popd
 exitcode=$?
+popd
 
 if [ "$exitcode" -eq 0 ];
 then
