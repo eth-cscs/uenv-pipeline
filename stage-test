@@ -122,7 +122,7 @@ export PATH="$(pwd)/reframe/bin:$PATH"
 
 log "clone cscs-reframe-tests"
 rm -rf cscs-reframe-tests
-git clone --single-branch --branch main https://github.com/eth-cscs/cscs-reframe-tests.git
+git clone --single-branch --branch uenv-deployment-mode https://github.com/eth-cscs/cscs-reframe-tests.git
 pip install python-hostlist pyfirecrest
 
 export UENV="${squashfs_path}"
