@@ -22,8 +22,7 @@ stages:
     pipeline: $PARENT_PIPELINE_ID
     job: pipeline-configure
   variables:
-    SLURM_TIMELIMIT: 30
-    GIT_STRATEGY: fetch
+    SLURM_TIMELIMIT: 180
   script:
   - ./uenv-pipeline/stage-test -n $STACK_NAME -s $STACK_SYSTEM -m $STACK_MOUNT -u $STACK_UARCH
 
@@ -49,20 +48,31 @@ build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
     {{ name }}: "{{ value }}"
     {% endfor %}
 
-{% if (not job.runner.f7t) and (job.runner.baremetal_runner) %}
-
 test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
   extends: .base-test
-  tags: ["{{job.runner.baremetal_runner}}"]
-  needs: ["build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"]
+{% if job.runner.f7t %}
+  tags: ["f7t-runner"]
+{% else %}
+  tags: ["{{job.runner.slurm_runner}}"]
+{% endif %}
+  needs:
+    # Repeat the needs for the parent pipeline. Only specifying the build-* job
+    # as a needs here would override the needs for the parent pipeline. Not
+    # depending on the parent pipeline means that the artifact from the parent
+    # pipeline isn't downloaded, which contains e.g. the checkout of
+    # uenv-pipeline.
+    - pipeline: $PARENT_PIPELINE_ID
+      job: pipeline-configure
+    - job: "build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}"
   variables:
     STACK_NAME:       "{{job.uenv}}/{{job.version}}"
     STACK_SYSTEM:     "{{job.system}}"
     STACK_UARCH:      "{{job.uarch}}"
     STACK_MOUNT:      "{{job.mount}}"
     SLURM_PARTITION:  "{{job.partition}}"
-
-{% endif %}
+    {% for name, value in job.runner.variables.items() %}
+    {{ name }}: "{{ value }}"
+    {% endfor %}
 
 {% endfor %}
 
