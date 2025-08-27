@@ -204,8 +204,9 @@ log "building image in ${build_path}"
 log "note, environment variable values are not printed"
 echo "env --ignore-environment ${BUILD_VAR_NAMES[@]} make store.squashfs -j64"
 env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj64
+#
 # if the build failed, try again and back off to only 8 tasks
-[[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8 || cat 
+[[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8
 
 if [ ! $? -eq 0 ]; then
     log "$(ls ${build_path}/tmp)"
