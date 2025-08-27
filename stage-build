@@ -205,12 +205,17 @@ log "note, environment variable values are not printed"
 echo "env --ignore-environment ${BUILD_VAR_NAMES[@]} make store.squashfs -j64"
 env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj64
 # if the build failed, try again and back off to only 8 tasks
-[[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8
+[[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8 || cat 
 
 if [ ! $? -eq 0 ]; then
-    log "JOB Failed: pushing to build cache before exit"
-    env --ignore-environment "${BUILD_VARS[@]}" make cache-force -j32
-    cp -r "${build_path}/tmp/$(id -un)/spack-stage/" $CI_PROJECT_DIR
+    log "$(ls ${build_path}/tmp)"
+
+    logpath="$CI_PROJECT_DIR/build-logs"
+    log "saving logs to $logpath"
+    rm -rf "$logpath"
+    mkdir "$logpath"
+    cp "${build_path}/spack-bootstrap-output" "$logpath"
+    cp -r "${build_path}/tmp" $logpath
     err "error building image"
 fi
 
