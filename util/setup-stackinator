@@ -22,11 +22,11 @@ log "using stackinator version ${stackinator_version}"
 log "installing stackinator from git in '${stackinator_path}'"
 
 log "cloning stackinator from ${stackinator_repo}"
-git clone --quiet "${stackinator_repo}" "${stackinator_path}" || err "unable to clone stackinator git repository"
+git clone "${stackinator_repo}" "${stackinator_path}" || err "unable to clone stackinator git repository"
 
 cd "${stackinator_path}"
 log "checkout stackinator ${stackinator_version}"
-git checkout --quiet "${stackinator_version}" || err "unable to checkout out requested version"
+git checkout "${stackinator_version}" || err "unable to checkout out requested version"
 
 cd "${stackinator_base_path}"
 log "finished stackinator installation"
@@ -38,8 +38,8 @@ cluster_path=`mktemp -d`
 cluster_repo=https://github.com/eth-cscs/alps-cluster-config
 
 log "cloning cluster config from ${cluster_repo}"
-git clone --quiet "${cluster_repo}" "${cluster_path}" || err "unable to clone cluster-config git repository"
+git clone "${cluster_repo}" "${cluster_path}" || err "unable to clone cluster-config git repository"
 
 log "checkout alps-cluster-config ${stackinator_version}"
 cd "${cluster_path}"
-git checkout --quiet "${stackinator_version}" || err "unable to checkout out requested version"
+git checkout "${stackinator_version}" || err "unable to checkout out requested version"
