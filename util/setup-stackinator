@@ -12,7 +12,7 @@ log "detected uenv recipe version $uenv_recipe_version"
 if [ "$uenv_recipe_version" = "1" ]; then
     stackinator_version=releases/v5
 elif [ "$uenv_recipe_version" = "2" ]; then
-    stackinator_version=xpmem-buildable
+    stackinator_version=main
 else
     err "invalide uenv recipe version '${uenv_recipe_version}': must be '1' ir '2'"
 fi
@@ -40,6 +40,7 @@ cluster_repo=https://github.com/eth-cscs/alps-cluster-config
 log "cloning cluster config from ${cluster_repo}"
 git clone "${cluster_repo}" "${cluster_path}" || err "unable to clone cluster-config git repository"
 
+stackinator_version=xpmem-buildable
 log "checkout alps-cluster-config ${stackinator_version}"
 cd "${cluster_path}"
 git checkout "${stackinator_version}" || err "unable to checkout out requested version"
