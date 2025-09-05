@@ -12,7 +12,7 @@ log "detected uenv recipe version $uenv_recipe_version"
 if [ "$uenv_recipe_version" = "1" ]; then
     stackinator_version=releases/v5
 elif [ "$uenv_recipe_version" = "2" ]; then
-    stackinator_version=main
+    stackinator_version=xpmem-buildable
 else
     err "invalide uenv recipe version '${uenv_recipe_version}': must be '1' ir '2'"
 fi
