@@ -42,7 +42,6 @@ usage () {
     echo "  uarch:       the target micro-architecture"
     echo "  mount:       the mount point of the image"
     echo ""
-    echo "-d: enable spack develop mode"
     echo "-w: enable no-bwrap mode"
     echo "-t: disable pushing artifacts to registry"
     [[ "" == "$1" ]] && exit 0
@@ -55,7 +54,6 @@ recipe_path="-"
 build_root="-"
 uarch="-"
 mount="-"
-spack_develop=""
 no_bwrap=""
 # if this is set to "yes", assume we are doing a manual test run and do
 # not push to jfrog
@@ -74,7 +72,6 @@ do
         b) build_root="${OPTARG}";;
         u) uarch=${OPTARG};;
         m) mount=${OPTARG};;
-        d) spack_develop="--develop";;
         w) no_bwrap="--no-bwrap";;
         t) no_push="yes";;
     esac
@@ -103,7 +100,6 @@ log "build-path     ${build_path}"
 log "ci-path        ${ci_path}"
 log "pipeline-path  ${pipeline_path}"
 log "mount          ${mount}"
-[[ ! -z ${spack_develop} ]] && log "develop"
 [[ ! -z ${no_bwrap} ]] && log "no bwrap"
 [[ "${no_push}" == "yes" ]] && log "disabled push to registry"
 
@@ -180,8 +176,8 @@ source ${pipeline_path}/util/setup-stackinator
 # call stackinator
 log "configuring stack"
 
-echo "stack-config -r ${recipe_path} -b ${build_path} -s $cluster_path/${system} -m ${mount} $cache_flags ${spack_develop} ${no_bwrap}"
-stack-config -r "${recipe_path}" -b "${build_path}" -s "$cluster_path/${system}"  -m "${mount}" $cache_flags ${spack_develop} ${no_bwrap}
+echo "stack-config -r ${recipe_path} -b ${build_path} -s $cluster_path/${system} -m ${mount} $cache_flags ${no_bwrap}"
+stack-config -r "${recipe_path}" -b "${build_path}" -s "$cluster_path/${system}"  -m "${mount}" $cache_flags ${no_bwrap}
 
 if [ ! $? -eq 0 ]; then
     # delete stackinator tool once it is no longer needed
