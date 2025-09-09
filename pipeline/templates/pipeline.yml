@@ -11,7 +11,7 @@ stages:
   variables:
     SLURM_TIMELIMIT: 180
   script:
-  - ./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/uenv-build $SPACK_DEVELOP -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP
+  - ./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/uenv-build -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP
   after_script:
   - rm -Rf /dev/shm/uenv-build
 
@@ -37,7 +37,6 @@ build-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
 {% endif %}
   variables:
     STACK_MOUNT:      "{{job.mount}}"
-    SPACK_DEVELOP:    "{{job.spack_develop}}"
     NO_BWRAP:         "{{job.no_bwrap}}"
     STACK_NAME:       "{{job.uenv}}/{{job.version}}"
     STACK_SYSTEM:     "{{job.system}}"
@@ -82,9 +81,8 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
 #@@cmd@@STACK_NAME="{{job.uenv}}/{{job.version}}"
 #@@cmd@@STACK_SYSTEM="{{job.system}}"
 #@@cmd@@STACK_RECIPE="{{job.recipe_path}}"
-#@@cmd@@SPACK_DEVELOP="{{job.spack_develop}}"
 #@@cmd@@STACK_MOUNT="{{job.mount}}"
 #@@cmd@@STACK_UARCH="{{job.uarch}}"
 #@@cmd@@NO_BWRAP="{{job.no_bwrap}}"
-#@@cmd@@./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/uenv-build $SPACK_DEVELOP -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP ${TESTRUN}
+#@@cmd@@./uenv-pipeline/stage-build -n $STACK_NAME -s $STACK_SYSTEM -r $STACK_RECIPE -b /dev/shm/uenv-build -m $STACK_MOUNT -u $STACK_UARCH $NO_BWRAP ${TESTRUN}
 {% endfor %}

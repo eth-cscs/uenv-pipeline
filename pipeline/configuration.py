@@ -30,17 +30,12 @@ class Version:
         self._uenv_name = uenv_name
         self._recipes = desc["recipes"]
         self._deploy = desc["deploy"]
-        self._use_spack_develop = desc["develop"]
         self._mount = desc["mount"]
         self._recipe_path = recipe_path
 
     @property
     def name(self):
         return self._name
-
-    @property
-    def spack_develop(self):
-        return self._use_spack_develop
 
     @property
     def mount(self):
@@ -196,10 +191,7 @@ class Config:
         cluster = self.clusters[env["system"]]
         target = next(tgt for tgt in cluster["targets"] if tgt["uarch"]==env["uarch"])
 
-        develop = ""
         version = self.uenv(env["uenv"]).version(env["version"])
-        if version.spack_develop:
-            develop = "-d"
 
         no_bwrap = ""
         if cluster["no_bwrap"]:
@@ -239,7 +231,6 @@ class Config:
             "uarch": env["uarch"],
             "recipe_path": env["recipe"],
             "pipeline_path": env["pipeline_path"],
-            "spack_develop": develop,
             "no_bwrap": no_bwrap,
             "mount": version.mount,
             "system": env["system"],
