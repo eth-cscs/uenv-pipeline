@@ -59,6 +59,9 @@ no_bwrap=""
 # not push to jfrog
 no_push=""
 
+# print numactl information
+numactl -s
+
 log "repo: $(git log -1 --pretty=format:'%D %h %s')"
 
 echo "====== parsing arguments $@"
