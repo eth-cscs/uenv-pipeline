@@ -73,8 +73,6 @@ artifact_path="${test_path}/artifacts"
 mkdir -p $artifact_path
 
 registry=jfrog.svc.cscs.ch/uenv
-#repo_base=build/${system}/${uarch}/${name}/${build_id}
-#repo=${repo_base}:latest
 repo_base=build/${system}/${uarch}/${name}
 repo=${repo_base}:${build_id}
 

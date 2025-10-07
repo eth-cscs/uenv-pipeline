@@ -72,6 +72,11 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
     {% for name, value in job.runner.variables.items() %}
     {{ name }}: "{{ value }}"
     {% endfor %}
+  artifacts:
+    when: always
+    paths:
+      - "*/cscs-reframe-tests/reframe.out"
+      - "*/cscs-reframe-tests/reframe.log"
 
 {% endfor %}
 
