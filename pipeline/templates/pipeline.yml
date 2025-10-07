@@ -75,8 +75,8 @@ test-{{job.uenv}}/{{job.version}}-{{job.system}}/{{job.uarch}}:
   artifacts:
     when: always
     paths:
-      - cscs-reframe-tests/reframe.out
-      - cscs-reframe-tests/reframe.log
+      - "*/cscs-reframe-tests/reframe.out"
+      - "*/cscs-reframe-tests/reframe.log"
 
 {% endfor %}
 
