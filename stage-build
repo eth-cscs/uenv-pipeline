@@ -206,6 +206,8 @@ env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj64
 #
 # if the build failed, try again and back off to only 8 tasks
 [[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8
+# if build failed, push built packages to the cache
+[[ $? -eq 0 ]] || env --ignore-environment "${BUILD_VARS[@]}" make cache-force
 
 if [ ! $? -eq 0 ]; then
     log "$(ls ${build_path}/tmp)"
