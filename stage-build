@@ -126,7 +126,6 @@ do
 done
 for var in "${BUILD_VARS[@]}"; do
     export "$var"
-    echo  "VARVAR $var"
 done
 # append the other variables that are required in the make environment
 BUILD_VARS+=("PATH=/usr/bin:/bin:${build_path}/spack/bin")
