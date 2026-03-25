@@ -203,13 +203,15 @@ log "building image in ${build_path}"
 log "note, environment variable values are not printed"
 echo "env --ignore-environment ${BUILD_VAR_NAMES[@]} make store.squashfs -j64"
 env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj64
+build_retcode=$?
 #
 # if the build failed, try again and back off to only 8 tasks
-[[ $? -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8
+[[ ${build_retcode} -eq 0  ]] || env --ignore-environment "${BUILD_VARS[@]}" make store.squashfs -kj8
+build_retcode=$?
 # if build failed, push built packages to the cache
-[[ $? -eq 0 ]] || env --ignore-environment "${BUILD_VARS[@]}" make cache-force
+[[ ${build_retcode} -eq 0 ]] || env --ignore-environment "${BUILD_VARS[@]}" make cache-force
 
-if [ ! $? -eq 0 ]; then
+if [ ! ${build_retcode} -eq 0 ]; then
     log "$(ls ${build_path}/tmp)"
 
     logpath="$CI_PROJECT_DIR/build-logs"
