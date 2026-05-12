@@ -257,6 +257,7 @@ else
     log "pushing meta data to ${outpath_repo}"
     log "oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta"
     (cd ./store; oras attach --registry-config ${jfrog_creds_path} --artifact-type uenv/meta ${outpath_repo} ./meta)
+    [[ $? -eq 0  ]] || err "failed to push metadata" ]]
 fi
 
 log "clean up build path '${build_path}'"
