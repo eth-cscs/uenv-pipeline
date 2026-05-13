@@ -116,9 +116,9 @@ git clone --single-branch --branch main https://github.com/eth-cscs/cscs-reframe
 
 log "setup python venv with reframe"
 rm -rf rfm_venv
-python3.11 -m venv rfm_venv
+uv venv rfm_venv
 source rfm_venv/bin/activate
-pip install -r cscs-reframe-tests/requirements.txt
+uv pip install -r cscs-reframe-tests/requirements.txt
 
 export UENV="${squashfs_path}"
 export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
