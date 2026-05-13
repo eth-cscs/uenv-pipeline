@@ -110,18 +110,15 @@ squashfs_path="${artifact_path}/store.squashfs"
 log "set up a python venv and pip install reframe"
 [[ -z "${SLURM_PARTITION}" ]] && RFM_SYSTEM="${system}" || RFM_SYSTEM="${system}:${SLURM_PARTITION}"
 
-rm -rf rfm_venv
-python3.11 -m venv rfm_venv
-source rfm_venv/bin/activate
-#pip install --upgrade reframe-hpc
-git clone --single-branch --branch v4.9.0 https://github.com/reframe-hpc/reframe.git
-(cd reframe; ./bootstrap.sh)
-export PATH="$(pwd)/reframe/bin:$PATH"
-
 log "clone cscs-reframe-tests"
 rm -rf cscs-reframe-tests
 git clone --single-branch --branch main https://github.com/eth-cscs/cscs-reframe-tests.git
-pip install python-hostlist pyfirecrest
+
+log "setup python venv with reframe"
+rm -rf rfm_venv
+python3.11 -m venv rfm_venv
+source rfm_venv/bin/activate
+pip install -r cscs-reframe-tests/requirements.txt
 
 export UENV="${squashfs_path}"
 export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
