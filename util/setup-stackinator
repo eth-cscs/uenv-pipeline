@@ -11,15 +11,13 @@ log "detected uenv recipe version $uenv_recipe_version"
 
 if [ "$uenv_recipe_version" = "1" ]; then
     stackinator_version=releases/v5
+    config_version=releases/v5
 elif [ "$uenv_recipe_version" = "2" ]; then
     # TODO: updated for lanl mirror testing
     #stackinator_version=main
     stackinator_repo=https://github.com/hpc/stackinator.git
     stackinator_version=lanl/mirrors
-elif [ "$uenv_recipe_version" = "3" ]; then
-    # TODO: added for testing v3 recipes
-    stackinator_repo=https://github.com/bcumming/stackinator.git
-    stackinator_version=spack-v1.2
+    config_version=main
 else
     err "invalid uenv recipe version '${uenv_recipe_version}': must be '1' ir '2'"
 fi
@@ -47,6 +45,6 @@ cluster_repo=https://github.com/eth-cscs/alps-cluster-config
 log "cloning cluster config from ${cluster_repo}"
 git clone --quiet "${cluster_repo}" "${cluster_path}" || err "unable to clone cluster-config git repository"
 
-log "checkout alps-cluster-config ${stackinator_version}"
+log "checkout alps-cluster-config ${config_version}"
 cd "${cluster_path}"
-git checkout --quiet "${stackinator_version}" || err "unable to checkout out requested version"
+git checkout --quiet "${config_version}" || err "unable to checkout out requested version"
