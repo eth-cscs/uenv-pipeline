@@ -11,10 +11,13 @@ log "detected uenv recipe version $uenv_recipe_version"
 
 if [ "$uenv_recipe_version" = "1" ]; then
     stackinator_version=releases/v5
+    cluster_config_version=releases/v5
 elif [ "$uenv_recipe_version" = "2" ]; then
     stackinator_version=releases/v6
+    cluster_config_version=main
 elif [ "$uenv_recipe_version" = "3" ]; then
     stackinator_version=main
+    cluster_config_version=main
 else
     err "invalid uenv recipe version '${uenv_recipe_version}': must be '1', '2' or '3'"
 fi
@@ -42,6 +45,6 @@ cluster_repo=https://github.com/eth-cscs/alps-cluster-config
 log "cloning cluster config from ${cluster_repo}"
 git clone --quiet "${cluster_repo}" "${cluster_path}" || err "unable to clone cluster-config git repository"
 
-log "checkout alps-cluster-config ${stackinator_version}"
+log "checkout alps-cluster-config ${cluster_config_version}"
 cd "${cluster_path}"
-git checkout --quiet "${stackinator_version}" || err "unable to checkout out requested version"
+git checkout --quiet "${cluster_config_version}" || err "unable to checkout out requested version"
