@@ -119,7 +119,7 @@ uv venv rfm_venv
 source rfm_venv/bin/activate
 uv pip install --link-mode=copy -r cscs-reframe-tests/requirements.txt
 
-export UENV="${squashfs_path}"
+export CSCS_RFM_UENV="${squashfs_path}"
 export RFM_AUTODETECT_METHODS="cat /etc/xthostname,hostname"
 export RFM_USE_LOGIN_SHELL=1
 
