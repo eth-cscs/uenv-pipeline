@@ -6,21 +6,23 @@ s8r_base_path="$(pwd)"
 stackinator_path=`mktemp -d`
 stackinator_repo=https://github.com/eth-cscs/stackinator.git
 
-uenv_recipe_version=$(yq '.version // 1' ${recipe_path}/config.yaml)
-log "detected uenv recipe version $uenv_recipe_version"
-
-if [ "$uenv_recipe_version" = "1" ]; then
-    stackinator_version=releases/v5
-    cluster_config_version=releases/v5
-elif [ "$uenv_recipe_version" = "2" ]; then
-    stackinator_version=releases/v6
-    cluster_config_version=main
-elif [ "$uenv_recipe_version" = "3" ]; then
-    stackinator_version=main
-    cluster_config_version=main
-else
-    err "invalid uenv recipe version '${uenv_recipe_version}': must be '1', '2' or '3'"
-fi
+case "$uenv_recipe_version" in
+    1)
+        stackinator_version=releases/v5
+        cluster_config_version=releases/v5
+        ;;
+    2)
+        stackinator_version=releases/v6
+        cluster_config_version=main
+        ;;
+    3)
+        stackinator_version=main
+        cluster_config_version=main
+        ;;
+    *)
+        err "invalid uenv recipe version '${uenv_recipe_version}': must be '1', '2' or '3'"
+        ;;
+esac
 
 log "using stackinator version ${stackinator_version}"
 

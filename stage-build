@@ -106,11 +106,34 @@ log "mount          ${mount}"
 [[ ! -z ${no_bwrap} ]] && log "no bwrap"
 [[ "${no_push}" == "yes" ]] && log "disabled push to registry"
 
-# Check if the recipe path exists
-[[ -d "${recipe_path}" ]] || err "recipe path '$recipe_path' does not exist"
+##
+# Download dependencies
+##
+
+source ${pipeline_path}/util/setup-dependencies
+
+if [ "$no_push" != "yes" ]; then
+    source ${pipeline_path}/util/setup-credentials
+fi
+
 
 # add pipeline directory to PATH
 export PATH="${pipeline_path}:$PATH"
+
+# Check the recipe
+[[ -d "${recipe_path}" ]] || err "recipe path '$recipe_path' does not exist"
+uenv_recipe_version=$(yq '.version // 1' ${recipe_path}/config.yaml)
+case "$uenv_recipe_version" in
+    1|2|3)
+        log "recipe version ${uenv_recipe_version}"
+        ;;
+    *)
+        err "invalid uenv recipe version '${uenv_recipe_version}': must be '1', '2' or '3'"
+        ;;
+esac
+
+log "detected uenv recipe version $uenv_recipe_version"
+
 
 # build a list of environment variables with the UENV_CIBUILDV_ prefix
 # in order to forward them to the make call that builds the uenv, and
@@ -136,34 +159,7 @@ BUILD_VAR_NAMES+=("PATH" "HOME")
 # Set up build cache flags if a build cache is available
 ##
 
-mirror_path=$SCRATCH/uenv-cache
-if [ -d "${mirror_path}" ]; then
-    log "found build cache at $mirror_path"
-    echo "root: $mirror_path" > cache.yaml
-    log "cache file: $(realpath cache.yaml) in working path $(pwd)"
-    key_path="${mirror_path}/push-key.gpg"
-    if [[ -f "${key_path}" ]]; then
-        log "found build cache key at $key_path"
-        echo "key: ${mirror_path}/push-key.gpg" >> cache.yaml
-    fi
-    log "cache.yaml:"
-    cat cache.yaml
-    cache_flags="--cache $(realpath cache.yaml)"
-else
-    log "no build cache found at $mirror_path"
-    rm -f cache.yaml
-    cache_flags=""
-fi
-
-##
-# Download dependencies
-##
-
-source ${pipeline_path}/util/setup-dependencies
-
-if [ "$no_push" != "yes" ]; then
-    source ${pipeline_path}/util/setup-credentials
-fi
+source ${pipeline_path}/util/setup-caches
 
 ##
 # Clone the stackinator and alps cluster configuration

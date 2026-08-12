@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+mirror_path=$SCRATCH/uenv-cache
+key_path="${mirror_path}/push-key.gpg"
+
+if [ -d "${mirror_path}" ]; then
+    log "found build cache at $mirror_path"
+
+    case "$uenv_recipe_version" in
+        1)
+            echo "root: $mirror_path" > cache.yaml
+            log "cache file: $(realpath cache.yaml) in working path $(pwd)"
+            if [[ -f "${key_path}" ]]; then
+                log "found build cache key at $key_path"
+                echo "key: ${mirror_path}/push-key.gpg" >> cache.yaml
+            fi
+            log "cache.yaml:"
+            cat cache.yaml
+            cache_flags="--cache $(realpath cache.yaml)"
+            ;;
+        2|3)
+            echo "buildcache:"            >  mirrors.yaml
+            echo "  mount_specific: true" >> mirrors.yaml
+            echo "  url: ${mirror_path}"  >> mirrors.yaml
+            if [[ -f "${key_path}" ]]; then
+                echo "  private_key: ${key_path}" >> mirrors.yaml
+            fi
+            echo "sourcecache:"           >> mirrors.yaml
+            echo "  path: ${mirror_path}" >> mirrors.yaml
+
+            log "mirrors.yaml:"
+            cat mirrors.yaml
+            cache_flags="--mirror=$(realpath mirrors.yaml)"
+            ;;
+        *)
+            err "not possible to configure mirrors for version ${uenv_recipe_version} recipes"
+            ;;
+    esac
+else
+    log "no build cache found at $mirror_path"
+    rm -f cache.yaml
+    cache_flags=""
+fi
+
