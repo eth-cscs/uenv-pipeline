@@ -106,6 +106,17 @@ log "mount          ${mount}"
 [[ ! -z ${no_bwrap} ]] && log "no bwrap"
 [[ "${no_push}" == "yes" ]] && log "disabled push to registry"
 
+##
+# Download dependencies
+##
+
+source ${pipeline_path}/util/setup-dependencies
+
+if [ "$no_push" != "yes" ]; then
+    source ${pipeline_path}/util/setup-credentials
+fi
+
+
 # add pipeline directory to PATH
 export PATH="${pipeline_path}:$PATH"
 
@@ -149,16 +160,6 @@ BUILD_VAR_NAMES+=("PATH" "HOME")
 ##
 
 source ${pipeline_path}/util/setup-caches
-
-##
-# Download dependencies
-##
-
-source ${pipeline_path}/util/setup-dependencies
-
-if [ "$no_push" != "yes" ]; then
-    source ${pipeline_path}/util/setup-credentials
-fi
 
 ##
 # Clone the stackinator and alps cluster configuration
