@@ -6,7 +6,6 @@ key_path="${mirror_path}/push-key.gpg"
 if [ -d "${mirror_path}" ]; then
     log "found build cache at $mirror_path"
 
-    if [ "$uenv_recipe_version" = "1" ]; then
     case "$uenv_recipe_version" in
         1)
             echo "root: $mirror_path" > cache.yaml
