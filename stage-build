@@ -110,6 +110,13 @@ log "mount          ${mount}"
 # Download dependencies
 ##
 
+# initialise the list of environment variables that are forwarded to the make
+# call that builds the uenv.
+# NOTE: this has to happen before sourcing setup-credentials, which appends the
+# JFrog credentials required by recipe pre-install hooks.
+BUILD_VARS=()
+BUILD_VAR_NAMES=()
+
 source ${pipeline_path}/util/setup-dependencies
 
 if [ "$no_push" != "yes" ]; then
@@ -135,20 +142,16 @@ esac
 log "detected uenv recipe version $uenv_recipe_version"
 
 
-# build a list of environment variables with the UENV_CIBUILDV_ prefix
+# add the environment variables with the UENV_CIBUILDV_ prefix
 # in order to forward them to the make call that builds the uenv, and
 # set them in this environment
-BUILD_VARS=()
-BUILD_VAR_NAMES=()
 for civarname in ${!UENV_CIBUILDV_*} ;
 do
     # NOTE: take care to print only the variable name, and not its value, to not leak secrets
     log "setting uenv build variable '${civarname#UENV_CIBUILDV_}'"
     BUILD_VARS+=("${civarname#UENV_CIBUILDV_}=${!civarname}")
     BUILD_VAR_NAMES+=("${civarname#UENV_CIBUILDV_}")
-done
-for var in "${BUILD_VARS[@]}"; do
-    export "$var"
+    export "${civarname#UENV_CIBUILDV_}=${!civarname}"
 done
 # append the other variables that are required in the make environment
 BUILD_VARS+=("PATH=/usr/bin:/bin:${build_path}/spack/bin")
