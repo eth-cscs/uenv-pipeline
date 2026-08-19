@@ -151,7 +151,9 @@ do
     log "setting uenv build variable '${civarname#UENV_CIBUILDV_}'"
     BUILD_VARS+=("${civarname#UENV_CIBUILDV_}=${!civarname}")
     BUILD_VAR_NAMES+=("${civarname#UENV_CIBUILDV_}")
-    export "${civarname#UENV_CIBUILDV_}=${!civarname}"
+done
+for var in "${BUILD_VARS[@]}"; do
+    export "$var"
 done
 # append the other variables that are required in the make environment
 BUILD_VARS+=("PATH=/usr/bin:/bin:${build_path}/spack/bin")
