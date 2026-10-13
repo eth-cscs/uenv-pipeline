@@ -115,7 +115,7 @@ git clone --single-branch --branch beverin_account https://github.com/iomaganari
 
 log "setup python venv with reframe"
 rm -rf rfm_venv
-uv venv rfm_venv --python "$(ls /usr/bin/python3.[0-9]* | grep -E 'python3\.[0-9]+$' | sort -V | tail -1)"
+uv venv --python 3.12 --managed-python rfm_venv
 source rfm_venv/bin/activate
 uv pip install --link-mode=copy -r cscs-reframe-tests/requirements.txt
 
