@@ -111,8 +111,7 @@ squashfs_path="${artifact_path}/store.squashfs"
 
 log "clone cscs-reframe-tests"
 rm -rf cscs-reframe-tests
-git clone --single-branch --branch main https://github.com/iomaganaris/cscs-reframe-tests.git
-pushd cscs-reframe-tests && git checkout beverin_account && popd
+git clone --single-branch --branch beverin_account https://github.com/iomaganaris/cscs-reframe-tests.git
 
 log "setup python venv with reframe"
 rm -rf rfm_venv
