@@ -111,7 +111,7 @@ squashfs_path="${artifact_path}/store.squashfs"
 
 log "clone cscs-reframe-tests"
 rm -rf cscs-reframe-tests
-git clone --single-branch --branch build/pyproject-toml https://github.com/gppezzi/cscs-reframe-tests.git
+git clone --single-branch --branch main https://github.com/eth-cscs/cscs-reframe-tests.git
 
 log "setup python venv with reframe"
 uv sync --project cscs-reframe-tests --link-mode=copy
