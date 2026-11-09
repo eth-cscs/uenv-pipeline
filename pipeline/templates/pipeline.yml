@@ -5,6 +5,9 @@ stages:
 .base-build:
   stage: build
   timeout: 8h
+  id_tokens:
+    JWT_CICD_EXT_MW:
+      aud: "https://cicd-ext-mw.cscs.ch"
   needs:
     pipeline: $PARENT_PIPELINE_ID
     job: pipeline-configure
@@ -18,6 +21,9 @@ stages:
 .base-test:
   stage: test
   timeout: 8h
+  id_tokens:
+    JWT_CICD_EXT_MW:
+      aud: "https://cicd-ext-mw.cscs.ch"
   needs:
     pipeline: $PARENT_PIPELINE_ID
     job: pipeline-configure
